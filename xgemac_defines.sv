@@ -1,0 +1,28 @@
+// XGEMAC Wishbone interface Address & Data Width
+`define XGEMAC_WB_ADDR_WIDTH 8
+`define XGEMAC_WB_DATA_WIDTH 32
+
+// XGEMAC XGMII interface Control & Data Width
+`define XGEMAC_XGMII_CONTROL_WIDTH 8
+`define XGEMAC_XGMII_DATA_WIDTH 64
+
+// XGEMAC TX RX interface Data & Modulus Width
+`define XGEMAC_TXRX_DATA_WIDTH 64
+`define XGEMAC_TXRX_MOD_WIDTH 3
+
+// Test Finish Timeout
+`define TIMEOUT 1500
+
+// XGEMAC TXRX Clock & Reset Period
+`define XGEMAC_TXRX_CLOCK_PERIOD 6400
+`define XGEMAC_TXRX_RESET_PERIOD 2
+
+// WishBone Clock & Reset Period
+`define XGEMAC_WB_CLOCK_PERIOD 10000
+`define XGEMAC_WB_RESET_PERIOD 2
+
+`define INCR_START_VALUE 0
+
+`define NO_OF_BITS_IN_BYTE 8
+`define TOTAL_BYTES_IN_TXRX_DATA `XGEMAC_TXRX_DATA_WIDTH/8
+`define MAX_VALUE_64BIT 'hFFFF_FFFF_FFFF_FFFF
