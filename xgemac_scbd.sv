@@ -1,10 +1,11 @@
 class xgemac_scbd;
   // XGEMAC Scoreboard Handles
-  xgemac_tb_config        h_cfg;
-  mailbox#(xgemac_tx_pkt) tx_mon_mbx;
-  mailbox#(xgemac_rx_pkt) rx_mon_mbx;
-  mailbox#(bit)           rst_mon_mbx;
-  xgemac_tx_pkt           tx_exp_pkt[$];
+  xgemac_tb_config         h_cfg;
+  mailbox#(xgemac_tx_pkt)  tx_mon_mbx;
+  mailbox#(xgemac_rx_pkt)  rx_mon_mbx;
+  mailbox#(xgemac_rst_pkt) rst_mon_mbx;
+  xgemac_tx_pkt            tx_exp_pkt[$];
+  mailbox#(bit)            rst_ack_mbx;
   string REPORT_TAG = "Scoreboard";
   
   // XGEMAC Scoreboard Constructor
@@ -15,7 +16,7 @@ class xgemac_scbd;
   // XGEMAC Scoreboard Build
   function void build();
     $display("%s: Build", REPORT_TAG);
-
+    rst_ack_mbx = new();
   endfunction: build
 
   // XGEMAC Scoreboard Connect
@@ -36,12 +37,48 @@ class xgemac_scbd;
   // Wait for TX PKT to arrive
   task wait_for_tx_pkt_and_calc_exp_data();
     xgemac_tx_pkt h_tx_exp_pkt, h_tx_exp_cln_pkt;
+    //xgemac_rst_pkt h_rst_pkt, h_rst_cln_pkt;
+    int cur_count;
+    bit rst_ack;
     forever begin
       tx_mon_mbx.get(h_tx_exp_pkt);
       $cast(h_tx_exp_cln_pkt, h_tx_exp_pkt.clone());
-      $display("From TX Monitor to SCBD");
-      h_tx_exp_cln_pkt.display();
-      tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
+      //rst_mon_mbx.get(h_rst_pkt);
+      //$cast(h_rst_cln_pkt, h_rst_pkt.clone());
+      //if(!rst_ack_mbx.try_get(rst_ack)) begin
+      //if(!h_rst_pkt.reset) begin
+      //  while(tx_exp_pkt.size()) begin
+      //    if(tx_exp_pkt.size() == 1) h_cfg.act_count++;
+      //    $display("Popped %p at %0t",tx_exp_pkt.pop_front(), $time);
+      //    h_cfg.act_count += 1; 
+      //  end
+      //end
+      //else begin
+        if(h_tx_exp_cln_pkt.pkt_tx_sop) cur_count = 0;
+        cur_count += 1;
+        $display("From TX Monitor to SCBD");
+        h_tx_exp_cln_pkt.display();
+
+        //Padding Handling
+        if(h_tx_exp_cln_pkt.pkt_tx_eop && cur_count < 8) begin
+          h_cfg.act_count -= (8-cur_count);
+          h_tx_exp_cln_pkt.pkt_tx_eop = 0;
+          h_tx_exp_cln_pkt.pkt_tx_mod = 0;
+          tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
+          while(cur_count++ < 8) begin
+            h_tx_exp_cln_pkt = new();
+            if(cur_count == 8) begin
+              h_tx_exp_cln_pkt.pkt_tx_eop = 1;
+              h_tx_exp_cln_pkt.pkt_tx_mod = 4;
+            end
+            tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
+          end
+        end
+        else begin
+          tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
+        end
+      //end
+      
     end
     
   endtask: wait_for_tx_pkt_and_calc_exp_data
@@ -62,21 +99,6 @@ class xgemac_scbd;
   // Checker that checks the Expected and Actual Data is similar
   function void check_exp_and_act_data(xgemac_rx_pkt h_rx_act_pkt);
     xgemac_tx_pkt h_tx_exp_pkt = tx_exp_pkt.pop_front();
-
-    // Padding Handling
-    if(h_cfg.trans_count < 8) begin
-      if(h_cfg.act_count == h_cfg.trans_count) begin
-        h_tx_exp_pkt.pkt_tx_eop = 0;
-        h_tx_exp_pkt.pkt_tx_mod = 0;
-      end
-      if(h_tx_exp_pkt == null) begin
-        h_tx_exp_pkt = new();
-        if(h_cfg.act_count == 8) begin
-          h_tx_exp_pkt.pkt_tx_eop = 1;
-          h_tx_exp_pkt.pkt_tx_mod = 4;
-        end
-      end
-    end
     
     // Checkers
     if(!check_received_data(h_tx_exp_pkt, h_rx_act_pkt)) begin

@@ -62,6 +62,16 @@ program xgemac_test_top(xgemac_clk_interface tx_rx_clk,
                                        h_rand_test = new(.h_cfg(h_cfg));
                                        $cast(h_base_test, h_rand_test);
                                      end
+          "xgemac_reset_test"      : begin
+                                       xgemac_reset_test h_reset_test;
+                                       h_reset_test = new(.h_cfg(h_cfg));
+                                       $cast(h_base_test, h_reset_test);
+                                     end
+          "xgemac_padding_test"    : begin
+                                       xgemac_padding_test h_padding_test;
+                                       h_padding_test = new(h_cfg);
+                                       $cast(h_base_test, h_padding_test);
+                                     end
           "xgemac_wb_test"         : begin
                                        xgemac_wb_test h_wb_test;
                                        h_wb_test = new(h_cfg);

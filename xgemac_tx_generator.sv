@@ -4,7 +4,6 @@ class xgemac_tx_generator;
   // TX Generator Handles
   xgemac_tb_config        h_cfg;
   mailbox#(xgemac_tx_pkt) tx_mbx;
-  mailbox#(bit)           rst_mbx;
   xgemac_tx_pkt           h_tx_pkt;
   xgemac_tx_pkt           h_tx_cln_pkt;
   string REPORT_TAG;
@@ -19,7 +18,6 @@ class xgemac_tx_generator;
   function void build();
     $display("%s: Build", REPORT_TAG);
     tx_mbx = new(1);
-    rst_mbx = new(1);
   endfunction: build
 
   // TX Generator Connect Method
@@ -58,7 +56,7 @@ class xgemac_tx_generator;
   task gen_and_send_incremental_stimulus();
     int data = `INCR_START_VALUE;
     int unsigned count;
-    h_tx_pkt = new();
+    h_tx_pkt = new(); 
     repeat(h_cfg.trans_count) begin
       h_tx_pkt.pkt_tx_data = data++;
       h_tx_pkt.pkt_tx_sop = (count == 0 || h_tx_pkt.pkt_tx_eop == 1);
@@ -91,14 +89,13 @@ class xgemac_tx_generator;
   endtask: gen_and_send_random_stimulus
 
   task gen_and_send_reset_stimulus();
-    int unsigned count;
+    static int unsigned count = 1;
+    int unsigned prev;
+    count -= 1;
     h_tx_pkt = new();
-    fork
-      apply_reset();
-    join_none
-    repeat(h_cfg.trans_count) begin
-      h_tx_pkt.pkt_tx_data = `XGEMAC_TXRX_DATA_WIDTH'hFFFF_FFFF_FFFF_FFFF;
-      h_tx_pkt.pkt_tx_sop = (count == 0);
+    while(count < h_cfg.trans_count) begin
+      h_tx_pkt.pkt_tx_data = count;
+      h_tx_pkt.pkt_tx_sop = (prev++ == 0);
       h_tx_pkt.pkt_tx_eop = (++count == h_cfg.trans_count);
       if(h_tx_pkt.pkt_tx_eop) begin
         h_tx_pkt.pkt_tx_mod = 0;
@@ -109,29 +106,13 @@ class xgemac_tx_generator;
       tx_mbx.put(h_tx_cln_pkt);
     end
 
-    wait(h_cfg.vif_txrx_rst.rst == 0);
-    @(posedge h_cfg.vif_txrx_rst.rst);
   endtask: gen_and_send_reset_stimulus
 
-  task apply_reset();
-    int count;
-    forever begin
-
-    @(posedge h_cfg.vif_txrx_clk.clk);
-     count+=1;
-      if(count inside {[7:9]}) begin
-        rst_mbx.put(1);
-      end
-      else rst_mbx.put(0);
-      if(count > 100) return;
-
-    end
-  endtask: apply_reset
 task gen_and_send_padding_stimulus();
     int unsigned count;
-    h_tx_pkt = new();
+    h_tx_pkt = new(); 
     repeat(h_cfg.trans_count) begin
-      void'(std::randomize(h_tx_pkt.pkt_tx_data));
+      h_tx_pkt.pkt_tx_data = 'hFFFF_FFFF_FFFF_FFFF;
       h_tx_pkt.pkt_tx_sop = (count == 0);
       h_tx_pkt.pkt_tx_eop = (++count == h_cfg.trans_count);
       if(h_tx_pkt.pkt_tx_eop) begin
@@ -144,9 +125,10 @@ task gen_and_send_padding_stimulus();
     end
 
   endtask: gen_and_send_padding_stimulus
+
+  task gen_and_send_underflow_stimulus();
+    
+  endtask: gen_and_send_underflow_stimulus
+
 endclass: xgemac_tx_generator
-
-
-
-
 

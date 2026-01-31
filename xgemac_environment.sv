@@ -8,7 +8,7 @@ class xgemac_environment;
     xgemac_clk_driver#(int, `XGEMAC_TXRX_CLOCK_PERIOD, vif_xgmii_clk_t) h_xgmii_clk_drv;
 
     // Reset Driver Handles
-    xgemac_rst_driver#(`XGEMAC_TXRX_RESET_PERIOD, NEG_RESET, vif_txrx_rst_t, 1) h_txrx_rst_drv;
+    xgemac_rst_driver#(`XGEMAC_TXRX_RESET_PERIOD, NEG_RESET, vif_txrx_rst_t) h_txrx_rst_drv;
     xgemac_rst_driver#(`XGEMAC_WB_RESET_PERIOD, POS_RESET, vif_wb_rst_t)        h_wb_rst_drv;
     xgemac_rst_driver#(`XGEMAC_TXRX_RESET_PERIOD, NEG_RESET, vif_xgmii_rst_t)   h_xgmii_rst_drv;
 
@@ -16,6 +16,9 @@ class xgemac_environment;
     xgemac_tx_generator h_tx_gen;
     xgemac_tx_driver    h_tx_drv;
     xgemac_tx_monitor   h_tx_mon;
+
+    xgemac_rst_generator h_txrx_rst_gen;
+    xgemac_rst_generator h_wb_rst_gen;
 
     // WishBone Generator, Driver & Monitor handles
     xgemac_wb_generator h_wb_gen;
@@ -31,6 +34,7 @@ class xgemac_environment;
 
     // Reset Monitor Handle
     xgemac_rst_monitor  h_rst_mon;
+    xgemac_rst_generator  h_xgmii_rst_gen;
     
     string REPORT_TAG = "XGEMAC Environment";
 
@@ -120,6 +124,18 @@ class xgemac_environment;
       h_rst_mon = new(.h_cfg(h_cfg));
       h_rst_mon.build();
       $display("Reset Monitor Build");
+
+      h_txrx_rst_gen = new(.h_cfg(h_cfg));
+      h_txrx_rst_gen.build();
+      $display("Reset Generator Build");
+
+      h_wb_rst_gen = new(.h_cfg(h_cfg));
+      h_wb_rst_gen.build();
+      $display("WB Reset Generator Build");
+
+      h_xgmii_rst_gen = new(.h_cfg(h_cfg));
+      h_xgmii_rst_gen.build();
+      $display("XGMII Reset generator");
     endfunction: build
 
     //Environment Connect
@@ -138,7 +154,9 @@ class xgemac_environment;
         if(h_cfg.has_rx_mon) h_scbd.rx_mon_mbx = h_rx_mon.rx_mon_mbx;
       end
       h_scbd.rst_mon_mbx = h_rst_mon.rst_mon_mbx;
-      h_txrx_rst_drv.rst_mbx = h_tx_gen.rst_mbx;
+      h_txrx_rst_drv.rst_mbx = h_txrx_rst_gen.rst_mbx;
+      h_wb_rst_drv.rst_mbx = h_wb_rst_gen.rst_mbx;
+      h_xgmii_rst_drv.rst_mbx = h_xgmii_rst_gen.rst_mbx; 
       if(h_cfg.has_tx_gen) h_tx_gen.connect();
       if(h_cfg.has_tx_drv) h_tx_drv.connect();
       if(h_cfg.has_tx_mon) h_tx_mon.connect();
@@ -148,6 +166,9 @@ class xgemac_environment;
       if(h_cfg.has_wb_drv) h_wb_drv.connect();
       if(h_cfg.has_scbd)   h_scbd.connect();
       if(h_cfg.has_wb_mon) h_wb_mon.connect();
+      h_txrx_rst_gen.connect();
+      h_rst_mon.connect();
+      h_xgmii_rst_gen.connect();
     endfunction: connect
 
     //Environment Run
@@ -159,7 +180,8 @@ class xgemac_environment;
             if(h_cfg.has_xgmii_clk_drv) h_xgmii_clk_drv.run();
             if(h_cfg.has_txrx_rst_drv)  h_txrx_rst_drv.run();
             if(h_cfg.has_wb_rst_drv)    h_wb_rst_drv.run();
-            if(h_cfg.has_xgmii_clk_drv) h_xgmii_rst_drv.run();
+            if(h_cfg.has_xgmii_rst_drv) h_xgmii_rst_drv.run();
+            h_rst_mon.run();
             if(h_cfg.has_tx_drv)        h_tx_drv.run();
             if(h_cfg.has_tx_mon)        h_tx_mon.run();
             if(h_cfg.has_rx_drv)        h_rx_drv.run();
@@ -184,6 +206,7 @@ class xgemac_environment;
       if(h_cfg.has_wb_drv)       h_wb_drv.report();
       if(h_cfg.has_wb_mon)       h_wb_mon.report();
       if(h_cfg.has_scbd)         h_scbd.report();
+      h_rst_mon.report();
     endfunction: report
 
 endclass: xgemac_environment

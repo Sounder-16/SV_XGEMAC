@@ -12,18 +12,18 @@ class xgemac_tx_pkt;
   bit first_rand;
   bit eop_prev;
   constraint Frames {
-    trans_count_in_each_frame.size() inside {[3:10]};
+    trans_count_in_each_frame.size() inside {[5:25]};
     foreach(trans_count_in_each_frame[i]) {
-      trans_count_in_each_frame[i] >7; trans_count_in_each_frame[i] <=total_count;
+      trans_count_in_each_frame[i] >1; trans_count_in_each_frame[i] <=total_count;
     }
     trans_count_in_each_frame.sum() == total_count;
   }
-  constraint SOP_EOP { (!first_rand) -> {pkt_tx_sop == 1; pkt_tx_eop == 0;}
+  constraint SOP_EOP { (!first_rand)                                -> {pkt_tx_sop == 1; pkt_tx_eop == 0;}
                        (first_rand && act_cnt == cur_frame_count-1) -> {pkt_tx_eop == 1;}
-                       (act_cnt != cur_frame_count-1) -> {pkt_tx_eop == 0;}
-                       (pkt_tx_eop == 0) -> pkt_tx_mod == 0; 
-                       (eop_prev == 1) -> {pkt_tx_eop == 0; pkt_tx_sop == 1; }
-                       (first_rand && eop_prev == 0) -> {pkt_tx_sop == 0;}
+                       (act_cnt != cur_frame_count-1)               -> {pkt_tx_eop == 0;}
+                       (pkt_tx_eop == 0)                            ->  pkt_tx_mod == 0; 
+                       (eop_prev == 1)                              -> {pkt_tx_eop == 0; pkt_tx_sop == 1; }
+                       (first_rand && eop_prev == 0)                -> {pkt_tx_sop == 0;}
                       }
   constraint MOD { !(pkt_tx_mod inside {[1:4]}); } // FIXIT
 

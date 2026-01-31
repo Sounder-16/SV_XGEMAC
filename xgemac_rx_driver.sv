@@ -69,7 +69,6 @@ class xgemac_rx_driver;
   task wait_and_drive();
     forever begin
       if(vif.mr_cb.pkt_rx_avail)begin
-
         repeat(h_cfg.ren_delay) begin
           @(posedge vif.clk);
         end

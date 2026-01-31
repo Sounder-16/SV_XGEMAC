@@ -28,9 +28,11 @@ package xgemac_package;
     // Include files
     `include "xgemac_tb_config.sv"
     `include "xgemac_clk_driver.sv"
+    `include "xgemac_rst_pkt.sv"
     `include "xgemac_rst_driver.sv"
     `include "xgemac_tx_pkt.sv"
     `include "xgemac_rx_pkt.sv"
+    `include "xgemac_rst_generator.sv"
     `include "xgemac_tx_driver.sv"
     `include "xgemac_wb_driver.sv"
     `include "xgemac_rx_driver.sv"

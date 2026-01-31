@@ -56,7 +56,7 @@ class xgemac_base_test;
      fork
         begin
           p[0] = process::self();
-          wait(h_cfg.act_count > 7 && h_cfg.trans_count <= h_cfg.act_count);
+          wait(h_cfg.trans_count == h_cfg.act_count);
         end
         begin
           p[1] = process::self();
@@ -170,6 +170,7 @@ class xgemac_wb_test extends xgemac_base_test;
 endclass: xgemac_wb_test
 
 class xgemac_reset_test extends xgemac_base_test;
+
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "RESET TEST";
@@ -177,12 +178,29 @@ class xgemac_reset_test extends xgemac_base_test;
 
   function void set_test_specific_configuration();
       $display("%s: Inside set test specific configuration", REPORT_TAG);
-      h_cfg.trans_count = 10;
+      h_cfg.trans_count = 15;
   endfunction: set_test_specific_configuration
 
   task give_stimulus();
+    process p[2];
     $display("%s: Inside Give Stimulus", REPORT_TAG);
-    h_env.h_tx_gen.gen_and_send_reset_stimulus();
+    fork
+      begin
+        p[0] = process::self();
+        h_env.h_tx_gen.gen_and_send_reset_stimulus();
+      end
+      begin
+        p[1] = process::self();
+        repeat(6) @(posedge h_cfg.vif_txrx_clk.clk);
+        fork
+          h_env.h_txrx_rst_gen.apply_reset();
+          h_env.h_xgmii_rst_gen.apply_reset();
+        join
+        if(p[0] != null) p[0].kill();
+        h_env.h_tx_gen.gen_and_send_reset_stimulus();
+        
+      end
+    join
   endtask: give_stimulus
 
 endclass: xgemac_reset_test
@@ -195,7 +213,7 @@ class xgemac_padding_test extends xgemac_base_test;
   endfunction: new
   function void set_test_specific_configuration();
       $display("%s: Inside set test specific configuration", REPORT_TAG);
-      h_cfg.trans_count = 2;
+      h_cfg.trans_count = 4;
   endfunction: set_test_specific_configuration
 
   task give_stimulus();
@@ -203,5 +221,4 @@ class xgemac_padding_test extends xgemac_base_test;
     h_env.h_tx_gen.gen_and_send_padding_stimulus();
   endtask: give_stimulus
 
-  
 endclass: xgemac_padding_test

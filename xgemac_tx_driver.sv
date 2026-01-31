@@ -75,7 +75,7 @@ class xgemac_tx_driver;
     forever begin
       tx_mbx.get(h_pkt);
       $cast(h_pkt_cln, h_pkt.clone());
-      $display("From TX Driver to VIF");
+      $display("From TX Driver to VIF at %0t", $time);
       h_pkt_cln.display();
       drive_into_pins(h_pkt_cln);
       @(posedge vif.clk);

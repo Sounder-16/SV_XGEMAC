@@ -73,7 +73,7 @@ class xgemac_tx_monitor;
         h_tx_pkt.pkt_tx_mod  = vif.mr_cb.pkt_tx_mod;
         
         $cast(h_tx_cln_pkt, h_tx_pkt.clone());
-        $display("From VIF to TX Monitor");
+        $display("From VIF to TX Monitor at %0t", $time);
         h_tx_cln_pkt.display();
         tx_mon_mbx.put(h_tx_pkt);
       end

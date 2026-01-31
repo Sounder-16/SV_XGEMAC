@@ -30,7 +30,11 @@ xgemac_tx_interface tx_intf(.clk(tx_rx_clk.clk), .rst(tx_rx_rst_n.rst));
 xgemac_rx_interface rx_intf(.clk(tx_rx_clk.clk), .rst(tx_rx_rst_n.rst));
 
 // XGMII Interface Instantiation
-xgemac_tx_rx_xgmii_interface xgmii_intf(.clk(xgmii_clk.clk), .rst(xgmii_rst_n.rst));
+xgemac_tx_rx_xgmii_interface xgmii_tx_intf(.clk(xgmii_clk.clk), .rst(xgmii_rst_n.rst));
+xgemac_tx_rx_xgmii_interface xgmii_rx_intf(.clk(xgmii_clk.clk), .rst(xgmii_rst_n.rst));
+
+assign xgmii_rx_intf.xgmii_txrxc = xgmii_tx_intf.xgmii_txrxc;
+assign xgmii_rx_intf.xgmii_txrxd = xgmii_tx_intf.xgmii_txrxd;
 
 // Wishbone Interface Instantiation
 xgemac_wb_interface wb_intf(.clk(wb_clk.clk), .rst(wb_rst.rst));
@@ -66,10 +70,10 @@ xge_mac DUT(.clk_156m25(tx_rx_clk.clk),
             .clk_xgmii_rx(xgmii_clk.clk),
             .reset_xgmii_tx_n(xgmii_rst_n.rst),
             .reset_xgmii_rx_n(xgmii_rst_n.rst),
-            .xgmii_txd(xgmii_intf.xgmii_txrxd),
-            .xgmii_txc(xgmii_intf.xgmii_txrxc),
-            .xgmii_rxd(xgmii_intf.xgmii_txrxd),
-            .xgmii_rxc(xgmii_intf.xgmii_txrxc)
+            .xgmii_txd(xgmii_tx_intf.xgmii_txrxd),
+            .xgmii_txc(xgmii_tx_intf.xgmii_txrxc),
+            .xgmii_rxd(xgmii_rx_intf.xgmii_txrxd),
+            .xgmii_rxc(xgmii_rx_intf.xgmii_txrxc)
 );
 
 // Testbench Code Instantiation
@@ -82,7 +86,7 @@ xgemac_test_top TB(.tx_rx_clk(tx_rx_clk),
                    .tx_intf(tx_intf),
                    .rx_intf(rx_intf),
                    .wb_intf(wb_intf),
-                   .xgmii_intf(xgmii_intf)
+                   .xgmii_intf(xgmii_tx_intf)
                     );
 
 
