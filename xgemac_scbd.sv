@@ -60,14 +60,14 @@ class xgemac_scbd;
         h_tx_exp_cln_pkt.display();
 
         //Padding Handling
-        if(h_tx_exp_cln_pkt.pkt_tx_eop && cur_count < 8) begin
-          h_cfg.act_count -= (8-cur_count);
+        if(h_tx_exp_cln_pkt.pkt_tx_eop && cur_count < `MINIMUM_VALID_TRANSACTION) begin
+          h_cfg.act_count -= (`MINIMUM_VALID_TRANSACTION-cur_count);
           h_tx_exp_cln_pkt.pkt_tx_eop = 0;
           h_tx_exp_cln_pkt.pkt_tx_mod = 0;
           tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
-          while(cur_count++ < 8) begin
+          while(cur_count++ < `MINIMUM_VALID_TRANSACTION) begin
             h_tx_exp_cln_pkt = new();
-            if(cur_count == 8) begin
+            if(cur_count == `MINIMUM_VALID_TRANSACTION) begin
               h_tx_exp_cln_pkt.pkt_tx_eop = 1;
               h_tx_exp_cln_pkt.pkt_tx_mod = 4;
             end
