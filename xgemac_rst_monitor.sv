@@ -27,12 +27,12 @@ class xgemac_rst_monitor;
     h_rst_pkt = new();
     forever begin
       if(vif.rst == 0) begin
-      //h_rst_pkt.reset = 0;
-      //end
+        h_rst_pkt.reset = 0;
+        rst_mon_mbx.put(h_rst_pkt);
+      end
       //else begin
       //  h_rst_pkt.reset = 1;
-       rst_mon_mbx.put(h_rst_pkt);
-      end
+      //end
       //rst_mon_mbx.put(h_rst_pkt);
       @(posedge vif.clk);
     end

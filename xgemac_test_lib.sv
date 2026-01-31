@@ -106,16 +106,19 @@ endclass: xgemac_direct_test
 
 class xgemac_incremental_test extends xgemac_base_test;
 
+  // Incremental Test Constructor
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "INCREMENTAL TEST";
   endfunction: new
 
+  // Incremental Test set test specific configuration
   function void set_test_specific_configuration();
     $display("%s: Set test Specific Configuration", REPORT_TAG);
     h_cfg.trans_count = 25;
   endfunction: set_test_specific_configuration
 
+  // Incremental Test give stimulus
   task give_stimulus();
     $display("%s: Give Stimulus", REPORT_TAG);
     h_env.h_tx_gen.gen_and_send_incremental_stimulus();
@@ -125,11 +128,13 @@ endclass: xgemac_incremental_test
 
 class xgemac_random_test extends xgemac_base_test;
   
+  // Random Test Constructor
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "RANDOM TEST";
   endfunction: new
 
+  // Random Test set test specific configuration
   function void set_test_specific_configuration();
     $display("%s: Set test specific Configuration", REPORT_TAG);
     h_cfg.ren_delay.rand_mode(0);
@@ -138,6 +143,7 @@ class xgemac_random_test extends xgemac_base_test;
     end
   endfunction: set_test_specific_configuration
 
+  // Random Test Give Stimulus
   task give_stimulus();
     $display("%s: Give Stimulus", REPORT_TAG);
     h_env.h_tx_gen.gen_and_send_random_stimulus();
@@ -146,20 +152,26 @@ class xgemac_random_test extends xgemac_base_test;
 endclass: xgemac_random_test
 
 class xgemac_wb_test extends xgemac_base_test;
+
+  // Wishbone Test Constructor
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "WISHBONE TEST";
   endfunction: new
+
+  // Wishbone Test set test specific configuration
   function void set_test_specific_configuration();
     $display("%s: set test specific configuration", REPORT_TAG);
     h_cfg.trans_count = 25;
   endfunction: set_test_specific_configuration
   
+  // Wishbone Test give stimulus
   task give_stimulus();
     $display("%s: give stimulus", REPORT_TAG);
     h_env.h_tx_gen.gen_and_send_incremental_stimulus();
   endtask: give_stimulus
 
+  // Run method
   task run();
     super.run();
     if(timeout) begin
@@ -167,20 +179,24 @@ class xgemac_wb_test extends xgemac_base_test;
       #40ns;
     end
   endtask: run
+
 endclass: xgemac_wb_test
 
 class xgemac_reset_test extends xgemac_base_test;
 
+  // Reset test Constructor
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "RESET TEST";
   endfunction: new
 
+  // Reset test set test specific configuration
   function void set_test_specific_configuration();
       $display("%s: Inside set test specific configuration", REPORT_TAG);
       h_cfg.trans_count = 15;
   endfunction: set_test_specific_configuration
 
+  // Reset test Give stimulus
   task give_stimulus();
     process p[2];
     $display("%s: Inside Give Stimulus", REPORT_TAG);
@@ -207,18 +223,95 @@ endclass: xgemac_reset_test
 
 class xgemac_padding_test extends xgemac_base_test;
 
+  // Padding test constructor
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "PADDING TEST";
   endfunction: new
+
+  // Padding test set test specific configuration
   function void set_test_specific_configuration();
       $display("%s: Inside set test specific configuration", REPORT_TAG);
       h_cfg.trans_count = 4;
   endfunction: set_test_specific_configuration
-
+  
+  // Padding test give stimulus
   task give_stimulus();
     $display("%s: Inside Give Stimulus", REPORT_TAG);
     h_env.h_tx_gen.gen_and_send_padding_stimulus();
   endtask: give_stimulus
 
 endclass: xgemac_padding_test
+
+class xgemac_underflow_test extends xgemac_base_test;
+  function new(xgemac_tb_config h_cfg);
+    super.new(h_cfg);
+    REPORT_TAG = "UNDERFLOW_TEST";
+  endfunction: new
+
+  function void set_test_specific_configuration();
+    $display("%s: set test specific configuration", REPORT_TAG);
+    h_cfg.trans_count = 8;
+  endfunction: set_test_specific_configuration
+
+  task give_stimulus();
+    $display("%s: give_stimulus", REPORT_TAG);
+
+  endtask: give_stimulus
+  
+endclass: xgemac_underflow_test
+
+class xgemac_error_case_two_SOP extends xgemac_base_test;
+  function new(xgemac_tb_config h_cfg);
+    super.new(h_cfg);
+    REPORT_TAG = "ERROR_CASE_2SOP";
+  endfunction: new
+
+  function void set_test_specific_configuration();
+    $display("%s: set test specific configuration", REPORT_TAG);
+    h_cfg.trans_count = 10;
+  endfunction: set_test_specific_configuration
+
+  task give_stimulus();
+    $display("%s: Give Stimulus", REPORT_TAG);
+    
+  endtask: give_stimulus
+
+
+endclass: xgemac_error_case_two_SOP
+
+class xgemac_error_case_direct_EOP extends xgemac_base_test;
+  function new(xgemac_tb_config h_cfg);
+    super.new(h_cfg);
+    REPORT_TAG = "ERROR_CASE_DIRECT_EOP";
+  endfunction: new
+
+  function void set_test_specific_configuration();
+    $display("%s: set test specific configuration", REPORT_TAG);
+    h_cfg.trans_count = 10;
+  endfunction: set_test_specific_configuration
+
+  task give_stimulus();
+    $display("%s: give stimulus", REPORT_TAG);
+
+  endtask: give_stimulus
+
+endclass: xgemac_error_case_direct_EOP
+
+class xgemac_error_case_SOP_EOP extends xgemac_base_test;
+  function new(xgemac_tb_config h_cfg);
+    super.new(h_cfg);
+    REPORT_TAG = "ERROR_CASE_SOP_EOP_IN_1CYCLE";
+  endfunction: new
+
+  function void set_test_specific_configuration();
+    $display("%s: set test specific configuration", REPORT_TAG);
+    h_cfg.trans_count = 8;
+  endfunction: set_test_specific_configuration
+
+  task give_stimulus();
+    $display("%s: give_stimulus", REPORT_TAG);
+
+  endtask: give_stimulus
+
+endclass: xgemac_error_case_SOP_EOP

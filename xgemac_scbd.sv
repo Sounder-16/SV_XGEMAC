@@ -37,7 +37,7 @@ class xgemac_scbd;
   // Wait for TX PKT to arrive
   task wait_for_tx_pkt_and_calc_exp_data();
     xgemac_tx_pkt h_tx_exp_pkt, h_tx_exp_cln_pkt;
-    //xgemac_rst_pkt h_rst_pkt, h_rst_cln_pkt;
+    xgemac_rst_pkt h_rst_pkt, h_rst_cln_pkt;
     int cur_count;
     bit rst_ack;
     forever begin
@@ -54,7 +54,7 @@ class xgemac_scbd;
       //  end
       //end
       //else begin
-        if(h_tx_exp_cln_pkt.pkt_tx_sop) cur_count = 0;
+        if(h_tx_exp_pkt.pkt_tx_sop) cur_count = 0;
         cur_count += 1;
         $display("From TX Monitor to SCBD");
         h_tx_exp_cln_pkt.display();
@@ -78,7 +78,6 @@ class xgemac_scbd;
           tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
         end
       //end
-      
     end
     
   endtask: wait_for_tx_pkt_and_calc_exp_data
@@ -92,6 +91,7 @@ class xgemac_scbd;
       $display("From RX Monitor to Scoreboard");
       h_rx_act_cln_pkt.display();
       h_cfg.act_count += 1;
+      $display("TC: %0d AC: %0d", h_cfg.trans_count, h_cfg.act_count);
      check_exp_and_act_data(h_rx_act_cln_pkt);
     end
   endtask: wait_for_rx_pkt
