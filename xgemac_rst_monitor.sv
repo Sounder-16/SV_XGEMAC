@@ -26,15 +26,12 @@ class xgemac_rst_monitor;
     @(posedge vif.rst);
     h_rst_pkt = new();
     forever begin
-      if(vif.rst == 0) begin
-        h_rst_pkt.reset = 0;
-        rst_mon_mbx.put(h_rst_pkt);
-      end
-      //else begin
-      //  h_rst_pkt.reset = 1;
+      @(negedge vif.rst);
+      rst_mon_mbx.put(h_rst_pkt);
+      //if(vif.rst == 0) begin     // FIXIT
+      //  rst_mon_mbx.put(h_rst_pkt);
       //end
-      //rst_mon_mbx.put(h_rst_pkt);
-      @(posedge vif.clk);
+      //@(posedge vif.clk);
     end
   endtask: run
 

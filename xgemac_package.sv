@@ -42,6 +42,7 @@ package xgemac_package;
     `include "xgemac_rx_monitor.sv"
     `include "xgemac_wb_monitor.sv"
     `include "xgemac_rst_monitor.sv"
+    `include "xgemac_coverage_class.sv"
     `include "xgemac_scbd.sv"
     `include "xgemac_environment.sv"
     `include "xgemac_test_lib.sv"

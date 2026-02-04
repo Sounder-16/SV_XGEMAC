@@ -26,8 +26,8 @@ class xgemac_tx_driver;
   task run();
     $display("%s: Run", REPORT_TAG);
     forever begin
-      wait_for_reset_done();
       reset_input_signals();
+      wait_for_reset_done();
       drive_transfer();
     end
   endtask: run

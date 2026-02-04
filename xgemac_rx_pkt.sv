@@ -5,6 +5,7 @@ class xgemac_rx_pkt;
   bit                               pkt_rx_eop;
   bit [`XGEMAC_TXRX_MOD_WIDTH-1:0]  pkt_rx_mod;
   bit                               pkt_rx_err;
+  bit                               pkt_rx_ren;
   
   // RX Packet Value Display Method
   function void display();

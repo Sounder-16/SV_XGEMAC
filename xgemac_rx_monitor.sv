@@ -76,6 +76,7 @@ class xgemac_rx_monitor;
         h_rx_pkt.pkt_rx_eop   = vif.mr_cb.pkt_rx_eop;
         h_rx_pkt.pkt_rx_mod   = vif.mr_cb.pkt_rx_mod; 
         h_rx_pkt.pkt_rx_err   = vif.mr_cb.pkt_rx_err;
+        h_rx_pkt.pkt_rx_ren   = vif.mr_cb.pkt_rx_ren;
 
         $display("From Vif to RX Monitor at %0tps", $time);
         $cast(h_rx_cln_pkt, h_rx_pkt.clone());

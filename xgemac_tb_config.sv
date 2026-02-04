@@ -29,6 +29,7 @@ class xgemac_tb_config;
    bit has_wb_mon        = 1;
    bit has_rx_mon        = 1;
    bit has_scbd          = 1;
+   bit tx_enable         = 1;
 
    rand int unsigned ren_delay;
    rand int unsigned trans_count;

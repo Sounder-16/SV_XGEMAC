@@ -71,7 +71,8 @@ class xgemac_tx_monitor;
         h_tx_pkt.pkt_tx_sop  = vif.mr_cb.pkt_tx_sop;
         h_tx_pkt.pkt_tx_eop  = vif.mr_cb.pkt_tx_eop;
         h_tx_pkt.pkt_tx_mod  = vif.mr_cb.pkt_tx_mod;
-        
+        h_tx_pkt.pkt_tx_full = vif.mr_cb.pkt_tx_full;
+
         $cast(h_tx_cln_pkt, h_tx_pkt.clone());
         $display("From VIF to TX Monitor at %0t", $time);
         h_tx_cln_pkt.display();

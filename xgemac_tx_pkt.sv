@@ -4,6 +4,7 @@ class xgemac_tx_pkt;
   rand bit                               pkt_tx_sop;
   rand bit                               pkt_tx_eop;
   rand bit [`XGEMAC_TXRX_MOD_WIDTH-1:0]  pkt_tx_mod;
+       bit                               pkt_tx_full;
   int unsigned cur_frame_count;
   int unsigned total_count;
   int unsigned act_cnt;
@@ -12,7 +13,7 @@ class xgemac_tx_pkt;
   bit first_rand;
   bit eop_prev;
   constraint Frames {
-    trans_count_in_each_frame.size() inside {[5:25]};
+    trans_count_in_each_frame.size() inside {[1:total_count/3]};
     foreach(trans_count_in_each_frame[i]) {
       trans_count_in_each_frame[i] >1; trans_count_in_each_frame[i] <=total_count;
     }
@@ -25,7 +26,9 @@ class xgemac_tx_pkt;
                        (eop_prev == 1)                              -> {pkt_tx_eop == 0; pkt_tx_sop == 1; }
                        (first_rand && eop_prev == 0)                -> {pkt_tx_sop == 0;}
                       }
-  constraint MOD { !(pkt_tx_mod inside {[1:4]}); } // FIXIT
+  constraint MOD { (trans_count_in_each_frame[index]== 8 && pkt_tx_eop) -> !(pkt_tx_mod inside {[1:3]});
+                   (trans_count_in_each_frame[index]!= 8 && pkt_tx_eop) -> {pkt_tx_mod dist { 1:=10, 2:=10, 3:=10, 4:=10, 5:=40, 6:=40, 7:=30};}
+                    } 
 
   function new(int total_count=0);
     this.total_count = total_count;

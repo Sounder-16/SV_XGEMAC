@@ -77,6 +77,31 @@ program xgemac_test_top(xgemac_clk_interface tx_rx_clk,
                                        h_wb_test = new(h_cfg);
                                        $cast(h_base_test, h_wb_test);
                                      end
+          "xgemac_2sop_test"       : begin
+                                       xgemac_error_case_two_SOP h_two_SOP;
+                                       h_two_SOP = new(h_cfg);
+                                       $cast(h_base_test, h_two_SOP);
+                                     end
+          "xgemac_direct_eop"      : begin
+                                       xgemac_error_case_direct_EOP h_direct_eop;
+                                       h_direct_eop = new(h_cfg);
+                                       $cast(h_base_test, h_direct_eop);
+                                     end
+          "xgemac_sop_eop"         : begin
+                                       xgemac_error_case_SOP_EOP h_sop_eop;
+                                       h_sop_eop = new(h_cfg);
+                                       $cast(h_base_test, h_sop_eop);
+                                     end
+          "xgemac_wb_tx_disable"   : begin
+                                       xgemac_tx_disable_test h_tx_dis;
+                                       h_tx_dis = new(h_cfg);
+                                       $cast(h_base_test, h_tx_dis);
+                                     end
+          "xgemac_no_sop_eop_test" : begin
+                                       xgemac_error_without_sop_eop h_no_sop_eop;
+                                       h_no_sop_eop = new(h_cfg);
+                                       $cast(h_base_test, h_no_sop_eop);
+                                     end
 
         endcase    
         h_base_test.build();

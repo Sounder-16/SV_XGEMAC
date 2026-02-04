@@ -115,7 +115,7 @@ class xgemac_incremental_test extends xgemac_base_test;
   // Incremental Test set test specific configuration
   function void set_test_specific_configuration();
     $display("%s: Set test Specific Configuration", REPORT_TAG);
-    h_cfg.trans_count = 25;
+    h_cfg.trans_count = 30;
   endfunction: set_test_specific_configuration
 
   // Incremental Test give stimulus
@@ -207,16 +207,16 @@ class xgemac_reset_test extends xgemac_base_test;
       end
       begin
         p[1] = process::self();
-        repeat(6) @(posedge h_cfg.vif_txrx_clk.clk);
+        repeat(25) @(posedge h_cfg.vif_txrx_clk.clk);
         fork
           h_env.h_txrx_rst_gen.apply_reset();
           h_env.h_xgmii_rst_gen.apply_reset();
         join
         if(p[0] != null) p[0].kill();
-        h_env.h_tx_gen.gen_and_send_reset_stimulus();
-        
+        h_env.h_tx_gen.gen_and_send_reset_stimulus(); 
       end
     join
+    repeat(100) @(posedge h_cfg.vif_txrx_clk.clk);
   endtask: give_stimulus
 
 endclass: xgemac_reset_test
@@ -274,7 +274,8 @@ class xgemac_error_case_two_SOP extends xgemac_base_test;
 
   task give_stimulus();
     $display("%s: Give Stimulus", REPORT_TAG);
-    
+    h_env.h_tx_gen.gen_and_send_2_SOP();
+    repeat(48) @(posedge h_cfg.vif_txrx_clk.clk); 
   endtask: give_stimulus
 
 
@@ -293,7 +294,7 @@ class xgemac_error_case_direct_EOP extends xgemac_base_test;
 
   task give_stimulus();
     $display("%s: give stimulus", REPORT_TAG);
-
+    h_env.h_tx_gen.gen_and_send_direct_EOP();
   endtask: give_stimulus
 
 endclass: xgemac_error_case_direct_EOP
@@ -311,7 +312,48 @@ class xgemac_error_case_SOP_EOP extends xgemac_base_test;
 
   task give_stimulus();
     $display("%s: give_stimulus", REPORT_TAG);
-
+    h_env.h_tx_gen.gen_and_send_SOP_EOP_at_same_time();
+    repeat(120) @(posedge h_cfg.vif_txrx_clk.clk);
   endtask: give_stimulus
 
 endclass: xgemac_error_case_SOP_EOP
+
+class xgemac_tx_disable_test extends xgemac_base_test;
+    function new(xgemac_tb_config h_cfg);
+      super.new(h_cfg);
+      REPORT_TAG = "TX DISABLE TEST";
+    endfunction: new
+
+    function void set_test_specific_configuration();
+      $display("%s: set test specific configuration", REPORT_TAG);
+      h_cfg.trans_count = 10;
+      h_cfg.tx_enable = 0;
+    endfunction: set_test_specific_configuration
+
+    task give_stimulus();
+      $display("%s: give stimulus", REPORT_TAG);
+      h_env.h_wb_gen.disable_tx_enable_configuration();
+      wait(h_cfg.vif_wb.wb_ack_o);
+      wait(h_cfg.vif_wb.wb_ack_o == 0);
+      repeat(10) @(posedge h_cfg.vif_tx.mr_cb);
+      h_env.h_tx_gen.gen_and_send_directed_stimulus();
+      repeat(50) @(posedge h_cfg.vif_tx.clk);
+    endtask: give_stimulus
+
+endclass: xgemac_tx_disable_test
+
+class xgemac_error_without_sop_eop extends xgemac_base_test;
+  function new(xgemac_tb_config h_cfg);
+    super.new(h_cfg);
+    REPORT_TAG = "ERROR_CASE_WITHOUT_SOP_EOP";
+  endfunction: new
+  function void set_test_specific_configuration();
+    $display("%s: set test specific configuration", REPORT_TAG);
+    h_cfg.trans_count = 10;
+  endfunction: set_test_specific_configuration
+  task give_stimulus();
+    $display("%s: give_stimulus", REPORT_TAG);
+    h_env.h_tx_gen.gen_and_send_without_sop_eop_stimulus();
+    repeat(100) @(posedge h_cfg.vif_txrx_clk.clk);
+  endtask: give_stimulus
+endclass: xgemac_error_without_sop_eop

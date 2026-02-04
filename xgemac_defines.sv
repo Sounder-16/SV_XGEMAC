@@ -11,7 +11,7 @@
 `define XGEMAC_TXRX_MOD_WIDTH 3
 
 // Test Finish Timeout
-`define TIMEOUT 1500
+`define TIMEOUT 7000
 
 // XGEMAC TXRX Clock & Reset Period
 `define XGEMAC_TXRX_CLOCK_PERIOD 6400

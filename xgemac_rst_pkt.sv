@@ -1,12 +1,10 @@
 class xgemac_rst_pkt;
 
-  bit reset;
-  int reset_period;
+  int reset_period = `XGEMAC_TXRX_RESET_PERIOD;
   
   function void display();
     $display("Reset Packet Value");
-    $display("Reset Value : %b", reset);
-    $display("RESET_PERIOD: %0d", reset_period);
+    $display("RESET PERIOD: %0d", reset_period);
   endfunction: display
 
   function xgemac_rst_pkt clone();
@@ -16,7 +14,6 @@ class xgemac_rst_pkt;
   endfunction: clone
 
   function void copy(xgemac_rst_pkt h_rst);
-    this.reset        = h_rst.reset;
     this.reset_period = h_rst.reset_period;
   endfunction: copy
 

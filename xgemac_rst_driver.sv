@@ -6,6 +6,7 @@ class xgemac_rst_driver#(RESET_PERIOD, rst_t rst, type vif_t);
     // Reset Driver Constructor
     function new(vif_t vif);
         this.vif = vif;
+        h_rst_pkt = new();
         REPORT_TAG = "Reset Driver";
     endfunction: new
     
@@ -23,13 +24,11 @@ class xgemac_rst_driver#(RESET_PERIOD, rst_t rst, type vif_t);
 
     // Reset Driver Run Method
     task run();
-        int reset_period;
         $display("%s: Run", REPORT_TAG);
         vif.rst = rst;
         @(posedge vif.clk);
         vif.rst = ~rst;
-        reset_period = (h_rst_pkt == null)?RESET_PERIOD:h_rst_pkt.reset_period;
-        repeat(reset_period) @(posedge vif.clk);
+        repeat(h_rst_pkt.reset_period) @(posedge vif.clk);
         vif.rst = rst;
         rst_mbx.get(h_rst_pkt);
         run();

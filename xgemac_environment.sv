@@ -205,8 +205,8 @@ class xgemac_environment;
       if(h_cfg.has_rx_mon)       h_rx_mon.report();
       if(h_cfg.has_wb_drv)       h_wb_drv.report();
       if(h_cfg.has_wb_mon)       h_wb_mon.report();
-      if(h_cfg.has_scbd)         h_scbd.report();
       h_rst_mon.report();
+      if(h_cfg.has_scbd)         h_scbd.report();
     endfunction: report
 
 endclass: xgemac_environment
