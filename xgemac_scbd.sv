@@ -36,6 +36,7 @@ class xgemac_scbd;
     join_none
   endtask: run
 
+  // Wait for reset to happen
   task wait_for_reset();
     int q_size;
     xgemac_rst_pkt h_rst_pkt;
@@ -51,9 +52,8 @@ class xgemac_scbd;
   task wait_for_tx_pkt_and_calc_exp_data();
     xgemac_tx_pkt h_tx_exp_pkt, h_tx_exp_cln_pkt;
     xgemac_rst_pkt h_rst_pkt, h_rst_cln_pkt;
-    int cur_count;
     bit received_sop, err_sop, err_eop;
-    int err_count, sop_eop_cnt, tx_dis_cnt, no_sop_eop_cnt;
+    int err_count, sop_eop_cnt, tx_dis_cnt, no_sop_eop_cnt, cur_count;
     forever begin
       tx_mon_mbx.get(h_tx_exp_pkt);
       $cast(h_tx_exp_cln_pkt, h_tx_exp_pkt.clone()); 
@@ -61,13 +61,12 @@ class xgemac_scbd;
       h_tx_exp_cln_pkt.display();
       h_coverage_class.get_values_from_tx_pkt(h_tx_exp_pkt);
       h_coverage_class.do_tx_sampling();
-      if(!h_cfg.tx_enable) begin
+      if(!h_cfg.tx_enable) begin // TX Disable Handling
         tx_dis_cnt++;
-        $display("-------------------------------------------> %0d", tx_dis_cnt);
         if(tx_dis_cnt == h_cfg.trans_count) h_cfg.act_count += tx_dis_cnt;
         continue;
       end
-      if(err_sop || (h_tx_exp_cln_pkt.pkt_tx_sop && received_sop)) begin
+      if(err_sop || (h_tx_exp_cln_pkt.pkt_tx_sop && received_sop)) begin // Continuous SOP error case
         err_sop = 'b1;
         err_count += (tx_exp_pkt.size()+1);
         while(tx_exp_pkt.pop_front());
@@ -79,7 +78,7 @@ class xgemac_scbd;
           h_cfg.act_count += err_count;
         end
       end
-      else if(err_eop || (!received_sop && h_tx_exp_cln_pkt.pkt_tx_eop)) begin
+      else if(err_eop || (!received_sop && h_tx_exp_cln_pkt.pkt_tx_eop)) begin //Continuous EOP error case
         err_eop = 'b1;
         err_count += (tx_exp_pkt.size()+1);
         while(tx_exp_pkt.pop_front());
@@ -90,12 +89,6 @@ class xgemac_scbd;
           h_cfg.act_count += err_count;
         end
       end
-      //else if(h_tx_exp_cln_pkt.pkt_tx_sop && h_tx_exp_cln_pkt.pkt_tx_eop) begin
-      //  sop_eop_cnt++;
-      //  if(sop_eop_cnt > 2) begin
-          
-      //  end
-      //end
       else if(received_sop || h_tx_exp_cln_pkt.pkt_tx_sop)begin // Valid Frame
         cur_count++;
         //Padding Handling
@@ -115,7 +108,7 @@ class xgemac_scbd;
             tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
           end
         end
-        else begin // no padding required
+        else begin // No Padding required
           tx_exp_pkt.push_back(h_tx_exp_cln_pkt);
         end
         if(h_tx_exp_cln_pkt.pkt_tx_eop) begin
@@ -145,13 +138,14 @@ class xgemac_scbd;
       $display("From RX Monitor to Scoreboard");
       h_rx_act_cln_pkt.display();
       h_cfg.act_count += 1;
-     check_exp_and_act_data(h_rx_act_cln_pkt);
+      check_exp_and_act_data(h_rx_act_cln_pkt);
     end
   endtask: wait_for_rx_pkt
 
   // Checker that checks the Expected and Actual Data is similar
   function void check_exp_and_act_data(xgemac_rx_pkt h_rx_act_pkt);
     xgemac_tx_pkt h_tx_exp_pkt = tx_exp_pkt.pop_front();
+
     // Checkers
     if(!check_received_data(h_tx_exp_pkt, h_rx_act_pkt)) begin
       $error("DATA MISMATCH: Expected Data %h and Actual Data %h does not match", h_tx_exp_pkt.pkt_tx_data, h_rx_act_pkt.pkt_rx_data);
@@ -182,7 +176,7 @@ class xgemac_scbd;
   // Checks the received data with modulus
   function bit check_received_data(xgemac_tx_pkt exp_pkt, xgemac_rx_pkt act_pkt);
     bit[`XGEMAC_TXRX_DATA_WIDTH-1:0] exp_res, act_res;
-    if(exp_pkt.pkt_tx_eop && exp_pkt.pkt_tx_mod ) begin
+    if(exp_pkt.pkt_tx_eop && exp_pkt.pkt_tx_mod ) begin 
       exp_res =exp_pkt.pkt_tx_data & ('hFFFF_FFFF_FFFF_FFFF<<(`NO_OF_BITS_IN_BYTE*(`TOTAL_BYTES_IN_TXRX_DATA-exp_pkt.pkt_tx_mod)));
     end
     else exp_res = exp_pkt.pkt_tx_data;

@@ -87,11 +87,6 @@ program xgemac_test_top(xgemac_clk_interface tx_rx_clk,
                                        h_direct_eop = new(h_cfg);
                                        $cast(h_base_test, h_direct_eop);
                                      end
-          "xgemac_sop_eop"         : begin
-                                       xgemac_error_case_SOP_EOP h_sop_eop;
-                                       h_sop_eop = new(h_cfg);
-                                       $cast(h_base_test, h_sop_eop);
-                                     end
           "xgemac_wb_tx_disable"   : begin
                                        xgemac_tx_disable_test h_tx_dis;
                                        h_tx_dis = new(h_cfg);

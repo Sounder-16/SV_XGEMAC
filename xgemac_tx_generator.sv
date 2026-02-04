@@ -1,4 +1,3 @@
-
 class xgemac_tx_generator;
 
   // TX Generator Handles
@@ -26,7 +25,7 @@ class xgemac_tx_generator;
     
   endfunction: connect
 
-  // TX Generator Stimulus Generation Method
+  // TX Generator Known Stimulus Generation Method
   task gen_and_send_directed_stimulus();
     int unsigned count;
     h_tx_pkt = new();
@@ -46,14 +45,7 @@ class xgemac_tx_generator;
 
   endtask: gen_and_send_directed_stimulus  
 
-  task gen_and_send_plus_rand_stimulus();
-    int count;
-    bit[`XGEMAC_TXRX_DATA_WIDTH-1:0] tx_data;
-    if($value$plusargs($sformatf("TX_DATA=%0d", count), tx_data)) begin
-
-    end
-  endtask: gen_and_send_plus_rand_stimulus
-
+  // TX Generator Incremental Stimulus Generation Method
   task gen_and_send_incremental_stimulus();
     int data = `INCR_START_VALUE;
     bit [`XGEMAC_TXRX_MOD_WIDTH-1:0]mod = 1;
@@ -75,6 +67,7 @@ class xgemac_tx_generator;
 
   endtask: gen_and_send_incremental_stimulus
 
+  // TX Generator Random Stimulus Generation Method
   task gen_and_send_random_stimulus();
     int unsigned count;
     h_tx_pkt = new(h_cfg.trans_count);
@@ -91,6 +84,7 @@ class xgemac_tx_generator;
 
   endtask: gen_and_send_random_stimulus
 
+  // TX Generator Reset Stimulus Generation Method
   task gen_and_send_reset_stimulus();
     static int unsigned count = 1;
     int unsigned prev;
@@ -112,7 +106,8 @@ class xgemac_tx_generator;
 
   endtask: gen_and_send_reset_stimulus
 
-task gen_and_send_padding_stimulus();
+  // TX Generator Padding Stimulus Generation Method
+  task gen_and_send_padding_stimulus();
     int unsigned count;
     h_tx_pkt = new(); 
     repeat(h_cfg.trans_count) begin
@@ -130,7 +125,8 @@ task gen_and_send_padding_stimulus();
 
   endtask: gen_and_send_padding_stimulus
 
-  task gen_and_send_2_SOP();
+  // TX Generator Continuous SOP Generation Method
+  task gen_and_send_continuous_SOP();
     int unsigned count;
     h_tx_pkt = new();
     repeat(h_cfg.trans_count) begin
@@ -145,8 +141,9 @@ task gen_and_send_padding_stimulus();
       h_tx_cln_pkt.display();
       tx_mbx.put(h_tx_cln_pkt);
     end
-  endtask: gen_and_send_2_SOP
+  endtask: gen_and_send_continuous_SOP
 
+  // TX Generator Continuous EOP Generation Method
   task gen_and_send_direct_EOP();
     int unsigned count;
     h_tx_pkt = new();
@@ -164,7 +161,8 @@ task gen_and_send_padding_stimulus();
     end
   endtask: gen_and_send_direct_EOP
   
-  task gen_and_send_SOP_EOP_at_same_time();
+  //TX Generator Continuous SOP EOP Generation Method
+/*task gen_and_send_SOP_EOP_at_same_time();
     int unsigned count;
     h_tx_pkt = new();
     repeat(h_cfg.trans_count) begin
@@ -180,9 +178,9 @@ task gen_and_send_padding_stimulus();
       h_tx_cln_pkt.display();
       tx_mbx.put(h_tx_cln_pkt);
     end
+  endtask: gen_and_send_SOP_EOP_at_same_time*/
 
-  endtask: gen_and_send_SOP_EOP_at_same_time
-
+  // TX Generator Stimulus Generation without SOP EOP
   task gen_and_send_without_sop_eop_stimulus();
     int unsigned count;
     h_tx_pkt = new();

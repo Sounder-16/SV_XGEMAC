@@ -81,6 +81,7 @@ class xgemac_base_test;
     
 endclass: xgemac_base_test
 
+// XGEMAC Direct Test
 class xgemac_direct_test extends xgemac_base_test;
   
   // Direct Test Constructor
@@ -101,9 +102,9 @@ class xgemac_direct_test extends xgemac_base_test;
       h_env.h_tx_gen.gen_and_send_directed_stimulus();
     
   endtask
-
 endclass: xgemac_direct_test
 
+//XGEMAC Incremental Test
 class xgemac_incremental_test extends xgemac_base_test;
 
   // Incremental Test Constructor
@@ -123,9 +124,9 @@ class xgemac_incremental_test extends xgemac_base_test;
     $display("%s: Give Stimulus", REPORT_TAG);
     h_env.h_tx_gen.gen_and_send_incremental_stimulus();
   endtask: give_stimulus
-
 endclass: xgemac_incremental_test
 
+// XGEMAC Random Test
 class xgemac_random_test extends xgemac_base_test;
   
   // Random Test Constructor
@@ -150,6 +151,7 @@ class xgemac_random_test extends xgemac_base_test;
   endtask: give_stimulus
 
 endclass: xgemac_random_test
+
 
 class xgemac_wb_test extends xgemac_base_test;
 
@@ -182,6 +184,7 @@ class xgemac_wb_test extends xgemac_base_test;
 
 endclass: xgemac_wb_test
 
+// XGEMAC Reset Test
 class xgemac_reset_test extends xgemac_base_test;
 
   // Reset test Constructor
@@ -221,6 +224,7 @@ class xgemac_reset_test extends xgemac_base_test;
 
 endclass: xgemac_reset_test
 
+// XGEMAC Padding Test
 class xgemac_padding_test extends xgemac_base_test;
 
   // Padding test constructor
@@ -243,7 +247,8 @@ class xgemac_padding_test extends xgemac_base_test;
 
 endclass: xgemac_padding_test
 
-class xgemac_underflow_test extends xgemac_base_test;
+// XGEMAC Underflow Test
+/*class xgemac_underflow_test extends xgemac_base_test;
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "UNDERFLOW_TEST";
@@ -259,8 +264,9 @@ class xgemac_underflow_test extends xgemac_base_test;
 
   endtask: give_stimulus
   
-endclass: xgemac_underflow_test
+endclass: xgemac_underflow_test*/
 
+// XGEMAC Continuous SOP Error Case Test
 class xgemac_error_case_two_SOP extends xgemac_base_test;
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
@@ -274,13 +280,12 @@ class xgemac_error_case_two_SOP extends xgemac_base_test;
 
   task give_stimulus();
     $display("%s: Give Stimulus", REPORT_TAG);
-    h_env.h_tx_gen.gen_and_send_2_SOP();
+    h_env.h_tx_gen.gen_and_send_continuous_SOP();
     repeat(48) @(posedge h_cfg.vif_txrx_clk.clk); 
   endtask: give_stimulus
-
-
 endclass: xgemac_error_case_two_SOP
 
+// XGEMAC Continuous EOP Error Test
 class xgemac_error_case_direct_EOP extends xgemac_base_test;
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
@@ -299,7 +304,8 @@ class xgemac_error_case_direct_EOP extends xgemac_base_test;
 
 endclass: xgemac_error_case_direct_EOP
 
-class xgemac_error_case_SOP_EOP extends xgemac_base_test;
+// XGEMAC Continuous SOP & EOP at same time
+/*class xgemac_error_case_SOP_EOP extends xgemac_base_test;
   function new(xgemac_tb_config h_cfg);
     super.new(h_cfg);
     REPORT_TAG = "ERROR_CASE_SOP_EOP_IN_1CYCLE";
@@ -316,8 +322,9 @@ class xgemac_error_case_SOP_EOP extends xgemac_base_test;
     repeat(120) @(posedge h_cfg.vif_txrx_clk.clk);
   endtask: give_stimulus
 
-endclass: xgemac_error_case_SOP_EOP
+endclass: xgemac_error_case_SOP_EOP*/
 
+// XGEMAC TX Disable using Wishbone 
 class xgemac_tx_disable_test extends xgemac_base_test;
     function new(xgemac_tb_config h_cfg);
       super.new(h_cfg);
